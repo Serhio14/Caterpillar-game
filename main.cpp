@@ -1,16 +1,16 @@
 #include <SFML/Graphics.hpp>
 #include <SFML/Audio.hpp>
-#include <iostream> // Для виведення лічильника в консоль, якщо потрібно
-#include <cstdlib>  // Для rand() і srand()
-#include <ctime>    // Для srand()
+#include <iostream> // To output the counter to the console if needed
+#include <cstdlib>  // For rand() and srand()
+#include <ctime>    // For srand()
 using namespace std;
 using namespace sf;
 
 int main() {
-    // Ініціалізація випадкових чисел
+    // Initialization of random numbers
     srand(static_cast<unsigned>(time(nullptr)));
 
-    // Створення вікна і іконки
+    // Creating a window and icon
     RenderWindow window(VideoMode(1920, 1042), "Caterpillar game");
     Image icon;
     if (!icon.loadFromFile("Image/icon.jpg")) {
@@ -18,52 +18,52 @@ int main() {
     }
     window.setIcon(1000, 1000, icon.getPixelsPtr());
 
-    // Встановлення фону трави
+    // Set grass background
     Texture Background;
     Background.loadFromFile("Image/Background.jpg");
     Sprite Object3(Background);
 
-    // Створення яблука
+    // Create an apple
     Texture Apple;
     Apple.loadFromFile("Image/Apple.png");
     Sprite Object1(Apple);
-    Object1.setPosition(866, 445);  // Початкова позиція в центрі
+    Object1.setPosition(866, 445);  // Initial position in the center
 
-    // Швидкість яблука
+    // The speed of the apple
     float moveSpeed = 0.3f;
 
-    // Створення гусениці
-    Texture Сaterpillar;
-    Сaterpillar.loadFromFile("Image/Caterpillar.png");
-    Sprite Object2(Сaterpillar);
-    Object2.setPosition(200.0f, 200.0f); // Початкова позиція
+    // Create the caterpillar
+    Texture Г‘aterpillar;
+    Г‘aterpillar.loadFromFile("Image/Caterpillar.png");
+    Sprite Object2(Г‘aterpillar);
+    Object2.setPosition(200.0f, 200.0f); // Initial position in the center
 
-    // Завантаження звуку
+    // Loading sound
     SoundBuffer collisionSoundBuffer;
     if (!collisionSoundBuffer.loadFromFile("Sounds/ukus_yabluka.wav")) {
         return 1;
     }
     Sound collisionSound(collisionSoundBuffer);
 
-    // Фонова музика
+    // Background music
     Music backgroundMusic;
     if (!backgroundMusic.openFromFile("Sounds/Doom Eternal OST - The Only Thing They Fear Is You.mp3")) {
-        return 1; // Перевірте наявність файлу музики
+        return 1; // Check for music file
     }
-    backgroundMusic.setLoop(true); // Музика буде повторюватися
+    backgroundMusic.setLoop(true); // The music will repeat
     backgroundMusic.play();
 
-    // Швидкість гусениці
-    Vector2f velocity(0.25f, 0.25f); // Швидкість у пікселях за кадр
+    // Track speed
+    Vector2f velocity(0.25f, 0.25f); // Speed вЂ‹вЂ‹in pixels per frame
 
-    // Лічильник зібраних яблук
+    // Counter of collected apples
     int appleCounter = 0;
     Font font;
     if (!font.loadFromFile("Fonts/arial.ttf")) {
-        return 1; // Перевірте, чи існує файл шрифту
+        return 1; // Check if the font file exists
     }
 
-    // Лічильник яблук
+    // Apple counter
     Text scoreText;
     scoreText.setFont(font);
     scoreText.setCharacterSize(24);
@@ -71,7 +71,7 @@ int main() {
     scoreText.setPosition(10, 10);
     scoreText.setString("Apple: 0");
 
-    // Таймер
+    // Timer
     Clock gameClock;
     Text timerText;
     timerText.setFont(font);
@@ -79,14 +79,14 @@ int main() {
     timerText.setFillColor(Color::White);
     timerText.setPosition(10, 40);
 
-    // Текст фінального повідомлення
+    // The text of the final message
     Text finalText;
     finalText.setFont(font);
-    finalText.setCharacterSize(100); // Зробимо великий текст
+    finalText.setCharacterSize(100); // Let's make a large text
     finalText.setFillColor(Color::White);
     finalText.setStyle(Text::Bold);
 
-    // Основний цикл
+    // The main cycle
     while (window.isOpen()) {
         Event event;
         while (window.pollEvent(event)) {
@@ -94,65 +94,65 @@ int main() {
                 window.close();
         }
 
-        // Оновлення таймера
+        // Update the timer
         int remainingTime = 30 - static_cast<int>(gameClock.getElapsedTime().asSeconds());
         timerText.setString("Time: " + to_string(remainingTime));
 
-        // Поточні координати яблука і цесениці
-        Vector2f applePosition = Object1.getPosition(); // Перейменовано змінну для уникнення конфліктів
-        Vector2f сaterpillarPosition = Object2.getPosition(); // Перейменовано змінну для уникнення конфліктів
+        // The current coordinates of the apple and the cherry tree
+        Vector2f applePosition = Object1.getPosition(); // Renamed the variable to avoid conflicts
+        Vector2f Г±aterpillarPosition = Object2.getPosition(); //Renamed the variable to avoid conflicts
 
-        // Автоматичний рух гусениці
-        сaterpillarPosition += velocity;
+        // Automatic track movement
+        Г±aterpillarPosition += velocity;
 
-        // Відбивання від меж екрану
-        if (сaterpillarPosition.x <= 0 || сaterpillarPosition.x + Object2.getGlobalBounds().width >= 1920) {
-            velocity.x = -velocity.x; // Зміна напрямку по x
+        // Г‚ВіГ¤ГЎГЁГўГ Г­Г­Гї ГўВіГ¤ Г¬ГҐГ¦ ГҐГЄГ°Г Г­Гі
+        if (Г±aterpillarPosition.x <= 0 || Г±aterpillarPosition.x + Object2.getGlobalBounds().width >= 1920) {
+            velocity.x = -velocity.x; // Change direction in x
         }
-        if (сaterpillarPosition.y <= 0 || сaterpillarPosition.y + Object2.getGlobalBounds().height >= 1042) {
-            velocity.y = -velocity.y; // Зміна напрямку по y
+        if (Г±aterpillarPosition.y <= 0 || Г±aterpillarPosition.y + Object2.getGlobalBounds().height >= 1042) {
+            velocity.y = -velocity.y; // Change direction in y
         }
 
-        Object2.setPosition(сaterpillarPosition); // Оновлення позиції Object2
+        Object2.setPosition(Г±aterpillarPosition); // Update the position of Object2
 
-        // Обробка клавіш для переміщення яблука
+        // Handle the keys to move the apple
         if (Keyboard::isKeyPressed(Keyboard::Up)) {
             if (applePosition.y > -18)
-                Object1.move(0, -moveSpeed); // Рух вгору
+                Object1.move(0, -moveSpeed);
         }
         if (Keyboard::isKeyPressed(Keyboard::Down)) {
             if (applePosition.y < 899)
-                Object1.move(0, moveSpeed); // Рух вниз
+                Object1.move(0, moveSpeed);
         }
         if (Keyboard::isKeyPressed(Keyboard::Left)) {
             if (applePosition.x > -28)
-                Object1.move(-moveSpeed, 0); // Рух вліво
+                Object1.move(-moveSpeed, 0);
         }
         if (Keyboard::isKeyPressed(Keyboard::Right)) {
             if (applePosition.x < 1782)
-                Object1.move(moveSpeed, 0); // Рух вправо
+                Object1.move(moveSpeed, 0);
         }
 
-        // Перевірка на зіткнення між яблуком та гусеницею
+        // Check for a collision between an apple and a caterpillar
         if (Object1.getGlobalBounds().intersects(Object2.getGlobalBounds())) {
-            collisionSound.play(); // Програвання звуку
+            collisionSound.play(); // Play sound
             appleCounter++;
             scoreText.setString("Apple: " + to_string(appleCounter));
 
-            // Переміщення яблука в випадкову позицію
+            // Move the apple to a random position
             Object1.setPosition(rand() % (1920 - static_cast<int>(Object1.getGlobalBounds().width)),
                 rand() % (1042 - static_cast<int>(Object2.getGlobalBounds().height)));
 
-            // Переміщення яблука в випадкову позицію
+            // Move the caterpillat to a random position
             Object2.setPosition(rand() % (1920 - static_cast<int>(Object2.getGlobalBounds().width)),
                 rand() % (1042 - static_cast<int>(Object2.getGlobalBounds().height)));
         }
 
-        /// Перевірка завершення гри
+        // Check for game completion
         if (appleCounter == 10) {
             finalText.setString("              Congratulations!\nYou fed the caterpillar 10 apples!");
 
-            // Центруємо текст
+            // Center the text
             FloatRect textBounds = finalText.getLocalBounds();
             finalText.setOrigin(textBounds.width / 2, textBounds.height / 2);
             finalText.setPosition(1920 / 2, 1042 / 2);
@@ -160,11 +160,11 @@ int main() {
             window.draw(Object3);
             window.draw(finalText);
             window.display();
-            sleep(seconds(3)); // Очікування 3 секунди перед закриттям
+            sleep(seconds(3)); // Wait 3 seconds before closing
             window.close();
         }
 
-        // Перевірка завершення часу
+        // Timeout check
         if (remainingTime <= 0) {
             finalText.setString("Game Over! Time's up!");
             FloatRect textBounds = finalText.getLocalBounds();
@@ -178,13 +178,13 @@ int main() {
             window.close();
         }
 
-        // Малювання
+       // Output
         window.clear();
-        window.draw(Object3);     // Фон
-        window.draw(Object1);     // Яблуко
-        window.draw(Object2);     // Гусениця
-        window.draw(scoreText);   // Лічильник
-        window.draw(timerText);   // Таймер
+        window.draw(Object3);     // background
+        window.draw(Object1);     // apple
+        window.draw(Object2);     // caterpillar
+        window.draw(scoreText);   // counter
+        window.draw(timerText);   // timer
         window.display();
     }
 
