@@ -1,16 +1,15 @@
 #include <SFML/Graphics.hpp>
 #include <SFML/Audio.hpp>
-#include <iostream> // To output the counter to the console if needed
 #include <cstdlib>  // For rand() and srand()
 #include <ctime>    // For srand()
 using namespace std;
 using namespace sf;
 
 int main() {
-    // Initialization of random numbers
+    // Initialize random numbers
     srand(static_cast<unsigned>(time(nullptr)));
 
-    // Creating a window and icon
+    // Create a window and set an icon
     RenderWindow window(VideoMode(1920, 1042), "Caterpillar game");
     Image icon;
     if (!icon.loadFromFile("Image/icon.jpg")) {
@@ -18,27 +17,30 @@ int main() {
     }
     window.setIcon(1000, 1000, icon.getPixelsPtr());
 
-    // Set grass background
+    // Set background texture
     Texture Background;
     Background.loadFromFile("Image/Background.jpg");
     Sprite Object3(Background);
 
-    // Create an apple
+    // Create the apple
     Texture Apple;
     Apple.loadFromFile("Image/Apple.png");
     Sprite Object1(Apple);
-    Object1.setPosition(866, 445);  // Initial position in the center
+    Object1.setPosition(866, 445);  // Initial position at the center
 
-    // The speed of the apple
+    // Speed of the apple
     float moveSpeed = 0.3f;
 
     // Create the caterpillar
-    Texture Ñaterpillar;
-    Ñaterpillar.loadFromFile("Image/Caterpillar.png");
-    Sprite Object2(Ñaterpillar);
-    Object2.setPosition(200.0f, 200.0f); // Initial position in the center
+    Texture Сaterpillar;
+    Сaterpillar.loadFromFile("Image/Caterpillar.png");
+    Sprite Object2(Сaterpillar);
+    Object2.setPosition(200.0f, 200.0f); // Initial position
 
-    // Loading sound
+    // Speed of the caterpillar
+    Vector2f velocity(0.35f, 0.35f); // Speed in pixels per frame
+
+    // Load collision sound
     SoundBuffer collisionSoundBuffer;
     if (!collisionSoundBuffer.loadFromFile("Sounds/ukus_yabluka.wav")) {
         return 1;
@@ -48,22 +50,19 @@ int main() {
     // Background music
     Music backgroundMusic;
     if (!backgroundMusic.openFromFile("Sounds/Doom Eternal OST - The Only Thing They Fear Is You.mp3")) {
-        return 1; // Check for music file
+        return 1; // Check if the music file exists
     }
     backgroundMusic.setLoop(true); // The music will repeat
     backgroundMusic.play();
 
-    // Track speed
-    Vector2f velocity(0.25f, 0.25f); // Speed ​​in pixels per frame
-
-    // Counter of collected apples
+    // Apple counter
     int appleCounter = 0;
     Font font;
     if (!font.loadFromFile("Fonts/arial.ttf")) {
         return 1; // Check if the font file exists
     }
 
-    // Apple counter
+    // Display the apple counter
     Text scoreText;
     scoreText.setFont(font);
     scoreText.setCharacterSize(24);
@@ -79,14 +78,14 @@ int main() {
     timerText.setFillColor(Color::White);
     timerText.setPosition(10, 40);
 
-    // The text of the final message
+    // Final message text
     Text finalText;
     finalText.setFont(font);
-    finalText.setCharacterSize(100); // Let's make a large text
+    finalText.setCharacterSize(100); // Make the text large
     finalText.setFillColor(Color::White);
     finalText.setStyle(Text::Bold);
 
-    // The main cycle
+    // Main game loop
     while (window.isOpen()) {
         Event event;
         while (window.pollEvent(event)) {
@@ -95,47 +94,49 @@ int main() {
         }
 
         // Update the timer
-        int remainingTime = 30 - static_cast<int>(gameClock.getElapsedTime().asSeconds());
+        int remainingTime = 45 - static_cast<int>(gameClock.getElapsedTime().asSeconds());
         timerText.setString("Time: " + to_string(remainingTime));
 
-        // The current coordinates of the apple and the cherry tree
-        Vector2f applePosition = Object1.getPosition(); // Renamed the variable to avoid conflicts
-        Vector2f ñaterpillarPosition = Object2.getPosition(); //Renamed the variable to avoid conflicts
+        // Current positions of the apple and caterpillar
+        Vector2f applePosition = Object1.getPosition(); // Renamed variable to avoid conflicts
+        Vector2f сaterpillarPosition = Object2.getPosition(); // Renamed variable to avoid conflicts
 
-        // Automatic track movement
-        ñaterpillarPosition += velocity;
+        // Automatic movement of the caterpillar
+        сaterpillarPosition += velocity;
 
-        // Â³äáèâàííÿ â³ä ìåæ åêðàíó
-        if (ñaterpillarPosition.x <= 0 || ñaterpillarPosition.x + Object2.getGlobalBounds().width >= 1920) {
-            velocity.x = -velocity.x; // Change direction in x
+        // Reflect the sprite when hitting the screen boundaries
+        if (сaterpillarPosition.x <= 0 || сaterpillarPosition.x + Object2.getGlobalBounds().width >= 1920) {
+            velocity.x = -velocity.x; // Change direction on X-axis
+            Vector2f currentScale = Object2.getScale();
+            Object2.setScale(-currentScale.x, currentScale.y); // Flip horizontally
         }
-        if (ñaterpillarPosition.y <= 0 || ñaterpillarPosition.y + Object2.getGlobalBounds().height >= 1042) {
-            velocity.y = -velocity.y; // Change direction in y
+        if (сaterpillarPosition.y <= 0 || сaterpillarPosition.y + Object2.getGlobalBounds().height >= 1042) {
+            velocity.y = -velocity.y; // Change direction on Y-axis (no vertical flipping needed)
         }
 
-        Object2.setPosition(ñaterpillarPosition); // Update the position of Object2
+        Object2.setPosition(сaterpillarPosition); // Update Object2's position
 
-        // Handle the keys to move the apple
+        // Handle keyboard input for moving the apple
         if (Keyboard::isKeyPressed(Keyboard::Up)) {
             if (applePosition.y > -18)
-                Object1.move(0, -moveSpeed);
+                Object1.move(0, -moveSpeed); // Move up
         }
         if (Keyboard::isKeyPressed(Keyboard::Down)) {
-            if (applePosition.y < 899)
-                Object1.move(0, moveSpeed);
+            if (applePosition.y < 928)
+                Object1.move(0, moveSpeed); // Move down
         }
         if (Keyboard::isKeyPressed(Keyboard::Left)) {
-            if (applePosition.x > -28)
-                Object1.move(-moveSpeed, 0);
+            if (applePosition.x > 0)
+                Object1.move(-moveSpeed, 0); // Move left
         }
         if (Keyboard::isKeyPressed(Keyboard::Right)) {
-            if (applePosition.x < 1782)
-                Object1.move(moveSpeed, 0);
+            if (applePosition.x < 1822)
+                Object1.move(moveSpeed, 0); // Move right
         }
 
-        // Check for a collision between an apple and a caterpillar
+        // Check for collision between the apple and caterpillar
         if (Object1.getGlobalBounds().intersects(Object2.getGlobalBounds())) {
-            collisionSound.play(); // Play sound
+            collisionSound.play(); // Play collision sound
             appleCounter++;
             scoreText.setString("Apple: " + to_string(appleCounter));
 
@@ -143,14 +144,14 @@ int main() {
             Object1.setPosition(rand() % (1920 - static_cast<int>(Object1.getGlobalBounds().width)),
                 rand() % (1042 - static_cast<int>(Object2.getGlobalBounds().height)));
 
-            // Move the caterpillat to a random position
+            // Move the caterpillar to a random position
             Object2.setPosition(rand() % (1920 - static_cast<int>(Object2.getGlobalBounds().width)),
                 rand() % (1042 - static_cast<int>(Object2.getGlobalBounds().height)));
         }
 
         // Check for game completion
         if (appleCounter == 10) {
-            finalText.setString("              Congratulations!\nYou fed the caterpillar 10 apples!");
+            finalText.setString("              Congratulations!\nYou feed the caterpillar 10 apples!");
 
             // Center the text
             FloatRect textBounds = finalText.getLocalBounds();
@@ -160,11 +161,11 @@ int main() {
             window.draw(Object3);
             window.draw(finalText);
             window.display();
-            sleep(seconds(3)); // Wait 3 seconds before closing
+            sleep(seconds(3)); // Wait for 3 seconds before closing
             window.close();
         }
 
-        // Timeout check
+        // Check for time expiration
         if (remainingTime <= 0) {
             finalText.setString("Game Over! Time's up!");
             FloatRect textBounds = finalText.getLocalBounds();
@@ -178,13 +179,13 @@ int main() {
             window.close();
         }
 
-       // Output
+        // Render everything
         window.clear();
-        window.draw(Object3);     // background
-        window.draw(Object1);     // apple
-        window.draw(Object2);     // caterpillar
-        window.draw(scoreText);   // counter
-        window.draw(timerText);   // timer
+        window.draw(Object3);     // Background
+        window.draw(Object1);     // Apple
+        window.draw(Object2);     // Caterpillar
+        window.draw(scoreText);   // Apple counter
+        window.draw(timerText);   // Timer
         window.display();
     }
 
